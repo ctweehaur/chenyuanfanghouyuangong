@@ -65,44 +65,44 @@
     let originalQuizQuestions = [];
 
     // 【终极重构注音引擎】：加入最全的标点与特殊符号过滤（破折号、箭头、引号、括号），让它们自动不消耗拼音！
-    function alignText(zh, py) {
-        if (!zh) return '';
-        const chars = zh.trim().split('');
-        const pys = py ? py.trim().split(/\s+/) : [];
-        let pIdx = 0;
-        let html = '';
-        for (let c of chars) {
-            // 精准拦截：增加对中文破折号、各类括号、特殊符号如箭头的全面过滤
-            if (/[，。？！：“”‘’（）《》、\-\:；—\(\)→\s]/.test(c)) {
-                html += `<span class="punctuation">${c}</span>`;
-            } else {
-                const p = pys[pIdx] || '';
-                html += `<span class="char-box"><span class="py-text">${p}</span><span class="zh-text">${c}</span></span>`;
-                pIdx++;
-            }
+  function alignText(zh, py) {
+    if (!zh) return '';
+    const chars = zh.trim().split('');
+    const pys = py ? py.trim().split(/\s+/) : [];
+    let pIdx = 0;
+    let html = '';
+    for (let c of chars) {
+        // 【核心修复】：正则表达式加入了 0-9 和 \. 让阿拉伯数字和半角点号自动变成不消耗拼音的标点样式！
+        if (/[，。？！：“”‘’（）《》、\-\:；—\(\)→\s0-9\.]/.test(c)) {
+            html += `<span class="punctuation">${c}</span>`;
+        } else {
+            const p = pys[pIdx] || '';
+            html += `<span class="char-box"><span class="py-text">${p}</span><span class="zh-text">${c}</span></span>`;
+            pIdx++;
         }
-        return html;
     }
+    return html;
+}
 
-    // 同样升级此处的过滤器
-    function alignTextWithPrefix(prefix, zh, py) {
-        if (!zh) return '';
-        const chars = zh.trim().split('');
-        const pys = py ? py.trim().split(/\s+/) : [];
-        let html = '';
-        html += `<span class="char-box" style="margin-right: 8px !important;"><span class="py-text">&nbsp;</span><span class="zh-text" style="font-weight: bold; color: #1e293b;">${prefix}</span></span>`;
-        let pIdx = 0;
-        for (let c of chars) {
-            if (/[，。？！：“”‘’（）《》、\-\:；—\(\)→\s]/.test(c)) {
-                html += `<span class="punctuation">${c}</span>`;
-            } else {
-                const p = pys[pIdx] || '';
-                html += `<span class="char-box"><span class="py-text">${p}</span><span class="zh-text">${c}</span></span>`;
-                pIdx++;
-            }
+// 同样把这个也一起改掉，确保万无一失
+function alignTextWithPrefix(prefix, zh, py) {
+    if (!zh) return '';
+    const chars = zh.trim().split('');
+    const pys = py ? py.trim().split(/\s+/) : [];
+    let html = '';
+    html += `<span class="char-box" style="margin-right: 8px !important;"><span class="py-text">&nbsp;</span><span class="zh-text" style="font-weight: bold; color: #1e293b;">${prefix}</span></span>`;
+    let pIdx = 0;
+    for (let c of chars) {
+        if (/[，。？！：“”‘’（）《》、\-\:；—\(\)→\s0-9\.]/.test(c)) {
+            html += `<span class="punctuation">${c}</span>`;
+        } else {
+            const p = pys[pIdx] || '';
+            html += `<span class="char-box"><span class="py-text">${p}</span><span class="zh-text">${c}</span></span>`;
+            pIdx++;
         }
-        return html;
     }
+    return html;
+}
 
     window.onload = function() {
         if (typeof quizQuestions !== 'undefined') {
